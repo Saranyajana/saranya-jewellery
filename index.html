@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Saranya Jewellery - Elegant jewellery collections for every special occasion."
+    />
+
+    <title>Saranya Jewellery | Elegant Jewellery Collection</title>
+
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <!-- HEADER -->
+    <header>
+      <div class="logo">✨ Saranya Jewellery</div>
+
+      <nav>
+        <a href="#home">Home</a>
+        <a href="#products">Collections</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+        <button onclick="openCart()">
+          🛒 Cart <span id="cartCount">0</span>
+        </button>
+      </nav>
+    </header>
+
+    <!-- HERO -->
+    <section id="home" class="hero">
+      <div class="hero-content">
+        <p class="small-title">PREMIUM JEWELLERY COLLECTION</p>
+
+        <h1>Elegance That<br />Shines Forever ✨</h1>
+
+        <p>
+          Discover beautiful jewellery collections designed to make every moment
+          special.
+        </p>
+
+        <a href="#products" class="shop-btn"> Explore Collection </a>
+      </div>
+    </section>
+
+    <!-- ================= CATEGORIES ================= -->
+
+    <section class="categories">
+      <p class="section-small">SHOP BY CATEGORY</p>
+
+      <h2>Explore Our Collections</h2>
+
+      <div class="category-container">
+        <a
+          href="#products"
+          class="category-card"
+          onclick="
+            filterProducts('ring');
+            return false;
+          "
+        >
+          <span>💍</span>
+          <h3>Rings</h3>
+          <p>Elegant & Modern</p>
+        </a>
+
+        <a
+          href="#products"
+          class="category-card"
+          onclick="
+            filterProducts('necklace');
+            return false;
+          "
+        >
+          <span>📿</span>
+          <h3>Necklaces</h3>
+          <p>Traditional Collection</p>
+        </a>
+
+        <a
+          href="#products"
+          class="category-card"
+          onclick="
+            filterProducts('earrings');
+            return false;
+          "
+        >
+          <span>✨</span>
+          <h3>Earrings</h3>
+          <p>Modern Designs</p>
+        </a>
+
+        <a
+          href="#products"
+          class="category-card"
+          onclick="
+            filterProducts('bridal');
+            return false;
+          "
+        >
+          <span>👑</span>
+          <h3>Bridal</h3>
+          <p>Wedding Collection</p>
+        </a>
+
+        <a
+          href="#products"
+          class="category-card"
+          onclick="
+            filterProducts('daily');
+            return false;
+          "
+        >
+          <span>💎</span>
+          <h3>Daily Wear</h3>
+          <p>Simple & Stylish</p>
+        </a>
+
+        <button class="all-products-btn" onclick="filterProducts('all')">
+          View All Jewellery
+        </button>
+      </div>
+    </section>
+    <!-- PRODUCTS -->
+    <section id="products" class="product-section">
+      <div class="product-container">
+        <!-- 1. Diamond Ring -->
+        <div class="product-card ring">
+          <img
+            src="https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=600&q=80"
+            alt="Diamond Ring"
+            class="product-img"
+          />
+
+          <h3>Diamond Ring</h3>
+
+          <p>Modern Collection</p>
+
+          <h4>₹1</h4>
+
+          <button onclick="addToCart('Diamond Ring', 1)">Add to Cart</button>
+
+          <button class="enquiry" onclick="enquire('Diamond Ring')">
+            Enquire Now
+          </button>
+        </div>
+
+        <!-- 2. Gold Necklace -->
+        <div class="product-card necklace">
+          <img
+            src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=600&q=80"
+            alt="Gold Necklace"
+            class="product-img"
+          />
+
+          <h3>Gold Necklace</h3>
+
+          <p>Traditional Collection</p>
+
+          <h4>₹1</h4>
+
+          <button onclick="addToCart('Gold Necklace', 1)">Add to Cart</button>
+
+          <button class="enquiry" onclick="enquire('Gold Necklace')">
+            Enquire Now
+          </button>
+        </div>
+
+        <!-- 3. Diamond Earrings -->
+        <div class="product-card earrings">
+          <img
+            src="https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=600&q=80"
+            alt="Diamond Earrings"
+            class="product-img"
+          />
+
+          <h3>Diamond Earrings</h3>
+
+          <p>Modern Collection</p>
+
+          <h4>₹1</h4>
+
+          <button onclick="addToCart('Diamond Earrings', 1)">
+            Add to Cart
+          </button>
+
+          <button class="enquiry" onclick="enquire('Diamond Earrings')">
+            Enquire Now
+          </button>
+        </div>
+
+        <!-- 4. Bridal Necklace -->
+        <div class="product-card bridal">
+          <img
+            src="https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=600&q=80"
+            alt="Bridal Necklace"
+            class="product-img"
+          />
+
+          <h3>Bridal Necklace</h3>
+
+          <p>Bridal Collection</p>
+
+          <h4>₹1</h4>
+
+          <button onclick="addToCart('Bridal Necklace', 1)">Add to Cart</button>
+
+          <button class="enquiry" onclick="enquire('Bridal Necklace')">
+            Enquire Now
+          </button>
+        </div>
+
+        <!-- 5. Bridal Set -->
+        <div class="product-card bridal">
+          <img
+            src="https://images.unsplash.com/photo-1599459183200-59c7687a0275?auto=format&fit=crop&w=600&q=80"
+            alt="Bridal Jewellery Set"
+            class="product-img"
+          />
+
+          <h3>Bridal Jewellery Set</h3>
+
+          <p>Bridal Collection</p>
+
+          <h4>₹1</h4>
+
+          <button onclick="addToCart('Bridal Jewellery Set', 1)">
+            Add to Cart
+          </button>
+
+          <button class="enquiry" onclick="enquire('Bridal Jewellery Set')">
+            Enquire Now
+          </button>
+        </div>
+
+        <!-- 6. Gold Bracelet -->
+        <div class="product-card daily">
+          <img
+            src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&w=600&q=80"
+            alt="Gold Bracelet"
+            class="product-img"
+          />
+
+          <h3>Gold Bracelet</h3>
+
+          <p>Daily Wear Collection</p>
+
+          <h4>₹1</h4>
+
+          <button onclick="addToCart('Gold Bracelet', 1)">Add to Cart</button>
+
+          <button class="enquiry" onclick="enquire('Gold Bracelet')">
+            Enquire Now
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about" class="about">
+      <p class="section-small">ABOUT US</p>
+
+      <h2>Jewellery With Elegance</h2>
+
+      <p>
+        Saranya Jewellery brings you elegant and beautiful jewellery collections
+        for every special occasion.
+      </p>
+    </section>
+
+    <!-- PAYMENT -->
+    <section class="payment" id="payment">
+      <p class="section-small">SECURE PAYMENT</p>
+
+      <h2>Scan & Pay</h2>
+
+      <p>Scan the QR code using your preferred UPI app.</p>
+      <div class="qr-box">
+        <div id="qrcode"></div>
+
+        <h3>
+          Amount:
+          <span id="paymentAmount">₹1</span>
+        </h3>
+
+        <p>Scan using your UPI app</p>
+
+        <button onclick="generatePaymentQR()">Generate QR</button>
+      </div>
+
+      <p class="demo-note">
+        Add products to cart and proceed to checkout to generate your payment
+        QR.
+      </p>
+    </section>
+    <!-- CONTACT -->
+    <section id="contact" class="contact">
+      <p class="section-small">GET IN TOUCH</p>
+
+      <h2>Have an Enquiry?</h2>
+
+      <p>Click below to contact us about our jewellery.</p>
+
+      <button onclick="generalEnquiry()">💬 Send Enquiry</button>
+    </section>
+
+    <!-- CART -->
+    <div id="cartBox" class="cart-box">
+      <div class="cart-header">
+        <h2>Your Cart</h2>
+
+        <button onclick="closeCart()">✕</button>
+      </div>
+
+      <div id="cartItems"></div>
+
+      <h3>Total: ₹<span id="cartTotal">0</span></h3>
+
+      <button class="checkout" onclick="checkout()">Proceed to Checkout</button>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+      <h3>✨ Saranya Jewellery</h3>
+
+      <p>Elegant Jewellery For Every Occasion</p>
+
+      <p>© 2026 Saranya Jewellery</p>
+    </footer>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
