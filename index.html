@@ -270,6 +270,39 @@
       </p>
     </section>
 
+    <section id="customerDetails">
+      <h2>Customer Details</h2>
+
+      <form id="customerForm">
+        <label for="customerName">Full Name</label>
+        <input
+          type="text"
+          id="customerName"
+          required
+          placeholder="Enter your name"
+        />
+
+        <label for="customerPhone">Phone Number</label>
+        <input
+          type="tel"
+          id="customerPhone"
+          required
+          pattern="[0-9]{10}"
+          maxlength="10"
+          placeholder="10-digit phone number"
+        />
+
+        <label for="customerAddress">Delivery Address</label>
+        <textarea
+          id="customerAddress"
+          required
+          placeholder="Enter your delivery address"
+        ></textarea>
+
+        <button type="submit">Place Order</button>
+      </form>
+    </section>
+
     <!-- PAYMENT -->
     <section class="payment" id="payment">
       <p class="section-small">SECURE PAYMENT</p>

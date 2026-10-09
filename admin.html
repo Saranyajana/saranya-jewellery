@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Saranya Jewellery - Admin</title>
+
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        background: #fffaf3;
+      }
+
+      h1 {
+        color: #8b6914;
+      }
+
+      button,
+      select {
+        padding: 10px;
+        margin: 5px 5px 5px 0;
+        border-radius: 5px;
+      }
+
+      button {
+        background: #8b6914;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+
+      .order {
+        background: white;
+        padding: 15px;
+        margin: 12px 0;
+        border: 1px solid #e5d6b5;
+        border-radius: 8px;
+      }
+
+      .error {
+        color: #b00020;
+      }
+      .success {
+        color: #176b35;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Saranya Jewellery — Admin Panel</h1>
+
+    <button onclick="loadOrders()">Refresh Orders</button>
+    <p id="message">Loading orders...</p>
+    <div id="orders"></div>
+
+    <script>
+      const API_URL = "http://localhost:8080/api/orders";
+
+      const adminUsername = prompt("Enter admin username:");
+      const adminPassword = prompt("Enter admin password:");
+
+      const authHeaders = {
+        Authorization: "Basic " + btoa(adminUsername + ":" + adminPassword),
+      };
+
+      async function loadOrders() {
+        const message = document.getElementById("message");
+        const container = document.getElementById("orders");
+
+        message.textContent = "Loading orders...";
+        message.className = "";
+        container.replaceChildren();
+
+        try {
+          const response = await fetch(API_URL, {
+            headers: authHeaders,
+          });
+
+          if (response.status === 401) {
+            message.textContent =
+              "Admin authentication required. Sign in first.";
+            message.className = "error";
+            return;
+          }
+
+          if (!response.ok) {
+            throw new Error("Could not load orders.");
+          }
+
+          const orders = await response.json();
+          message.textContent = "Total orders: " + orders.length;
+
+          orders.forEach((order) => {
+            const card = document.createElement("div");
+            card.className = "order";
+
+            const details = [
+              "Order ID: " + order.id,
+              "Customer: " + order.customerName,
+              "Phone: " + order.phone,
+              "Address: " + order.address,
+              "Products: " + order.productNames,
+              "Amount: ₹" + order.totalAmount,
+              "Current status: " + order.status,
+              "Date: " + order.orderDate,
+            ];
+
+            details.forEach((detail) => {
+              const line = document.createElement("p");
+              line.textContent = detail;
+              card.appendChild(line);
+            });
+
+            const label = document.createElement("label");
+            label.textContent = "Update status: ";
+
+            const select = document.createElement("select");
+
+            [
+              "PENDING",
+              "CONFIRMED",
+              "SHIPPED",
+              "DELIVERED",
+              "CANCELLED",
+            ].forEach((status) => {
+              const option = document.createElement("option");
+              option.value = status;
+              option.textContent = status;
+              select.appendChild(option);
+            });
+
+            select.value = order.status || "PENDING";
+
+            const updateButton = document.createElement("button");
+            updateButton.textContent = "Update Status";
+
+            updateButton.addEventListener("click", async () => {
+              await updateStatus(order.id, select.value);
+            });
+
+            card.appendChild(label);
+            card.appendChild(select);
+            card.appendChild(updateButton);
+            container.appendChild(card);
+          });
+        } catch (error) {
+          message.textContent =
+            "Unable to load orders. Check backend and login.";
+          message.className = "error";
+        }
+      }
+
+      async function updateStatus(orderId, status) {
+        const message = document.getElementById("message");
+        message.textContent = "Updating order status...";
+        message.className = "";
+
+        try {
+          const response = await fetch(
+            `${API_URL}/${orderId}/status?status=${encodeURIComponent(status)}`,
+            {
+              method: "PATCH",
+              headers: authHeaders,
+            },
+          );
+
+          if (response.status === 401 || response.status === 403) {
+            throw new Error("Admin login required or access denied.");
+          }
+
+          if (!response.ok) {
+            throw new Error("Status update failed.");
+          }
+
+          message.textContent = `Order #${orderId} status updated to ${status}.`;
+          message.className = "success";
+
+          await loadOrders();
+        } catch (error) {
+          message.textContent = error.message;
+          message.className = "error";
+        }
+      }
+
+      loadOrders();
+    </script>
+  </body>
+</html>

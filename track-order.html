@@ -1,0 +1,268 @@
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Track My Order - Saranya Jewellery</title>
+
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #fff8f2;
+        color: #38251f;
+      }
+
+      header {
+        background: #702b3b;
+        color: white;
+        text-align: center;
+        padding: 22px;
+      }
+
+      .container {
+        max-width: 500px;
+        margin: 45px auto;
+        padding: 25px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px #00000015;
+      }
+
+      h2 {
+        text-align: center;
+        color: #702b3b;
+      }
+
+      input {
+        width: 100%;
+        padding: 12px;
+        margin: 12px 0;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 16px;
+      }
+
+      button {
+        width: 100%;
+        padding: 12px;
+        background: #702b3b;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+
+      #result {
+        margin-top: 20px;
+        text-align: center;
+      }
+
+      .status {
+        font-weight: bold;
+        color: #176b43;
+        font-size: 20px;
+      }
+
+      .error {
+        color: #b00020;
+      }
+
+      .timeline {
+        margin-top: 25px;
+        text-align: left;
+      }
+
+      .timeline-step {
+        display: flex;
+        gap: 14px;
+        padding-bottom: 22px;
+        border-left: 2px solid #ddd;
+        margin-left: 12px;
+        padding-left: 18px;
+        position: relative;
+      }
+
+      .timeline-step:last-child {
+        border-left-color: transparent;
+      }
+
+      .timeline-marker {
+        position: absolute;
+        left: -13px;
+        top: 0;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: #eee;
+        color: #666;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+      }
+
+      .timeline-step.completed {
+        border-left-color: #258354;
+      }
+
+      .timeline-step.completed .timeline-marker {
+        background: #258354;
+        color: white;
+      }
+
+      .timeline-step h4 {
+        margin: 2px 0 6px;
+      }
+
+      .timeline-step p {
+        margin: 0;
+        color: #666;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <h1>Saranya Jewellery</h1>
+      <p>Track Your Order</p>
+    </header>
+
+    <div class="container">
+      <h2>Where is my order?</h2>
+
+      <label for="orderId">Enter your Order ID</label>
+      <input type="number" id="orderId" min="1" placeholder="Example: 1" />
+
+      <label for="phone">Enter your order phone number</label>
+      <input
+        type="tel"
+        id="phone"
+        placeholder="Phone number used while ordering"
+        required
+      />
+
+      <button onclick="trackOrder()">Track Order</button>
+
+      <div id="result" aria-live="polite"></div>
+    </div>
+
+    <script>
+      async function trackOrder() {
+        const orderId = document.getElementById("orderId").value.trim();
+        const phone = document.getElementById("phone").value.trim();
+        const result = document.getElementById("result");
+
+        if (!orderId || !phone) {
+          result.textContent = "Please enter Order ID and phone number.";
+          result.className = "error";
+          return;
+        }
+
+        result.textContent = "Checking your order...";
+        result.className = "";
+
+        try {
+          const url = `http://localhost:8080/api/orders/${encodeURIComponent(orderId)}/track`;
+
+          const response = await fetch(url, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              phone: phone,
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error(
+              "Order not found or Order ID and phone number do not match.",
+            );
+          }
+
+          const order = await response.json();
+
+          result.replaceChildren();
+
+          const heading = document.createElement("h3");
+          heading.textContent = "Order #" + order.orderId;
+
+          const status = document.createElement("p");
+          status.textContent = "Status: " + order.status;
+          status.className = "status";
+
+          const steps = ["PENDING", "CONFIRMED", "SHIPPED", "DELIVERED"];
+
+          const labels = ["Order Placed", "Confirmed", "Shipped", "Delivered"];
+
+          const descriptions = [
+            "Your order has been received.",
+            "Your order is confirmed.",
+            "Your order is on its way.",
+            "Your order has been delivered.",
+          ];
+
+          const timeline = document.createElement("div");
+          timeline.className = "timeline";
+
+          const currentStatus = order.status.toUpperCase();
+          const currentIndex = steps.indexOf(currentStatus);
+
+          steps.forEach((step, index) => {
+            const item = document.createElement("div");
+            item.className = "timeline-step";
+
+            const marker = document.createElement("span");
+            marker.className = "timeline-marker";
+            marker.textContent =
+              index <= currentIndex && currentIndex !== -1 ? "✓" : "○";
+
+            const details = document.createElement("div");
+
+            const title = document.createElement("h4");
+            title.textContent = labels[index];
+
+            const description = document.createElement("p");
+            description.textContent = descriptions[index];
+
+            if (index <= currentIndex && currentIndex !== -1) {
+              item.classList.add("completed");
+            }
+
+            details.append(title, description);
+            item.append(marker, details);
+            timeline.appendChild(item);
+          });
+
+          if (currentStatus === "CANCELLED") {
+            const cancelled = document.createElement("p");
+            cancelled.textContent = "This order has been cancelled.";
+            cancelled.className = "error";
+            result.append(heading, status, cancelled);
+          } else {
+            result.append(heading, status, timeline);
+          }
+        } catch (error) {
+          result.textContent =
+            error.message || "Unable to connect to the server.";
+          result.className = "error";
+        }
+      }
+      const params = new URLSearchParams(window.location.search);
+      const orderId = params.get("orderId");
+
+      if (orderId) {
+        document.getElementById("orderId").value = orderId;
+      }
+    </script>
+  </body>
+</html>
+```

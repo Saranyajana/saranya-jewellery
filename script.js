@@ -64,17 +64,25 @@ function checkout() {
     return;
   }
 
-  let total = 0;
-
-  cart.forEach(function (item) {
-    total += Number(item.price);
-  });
+  const total = cart.reduce((sum, item) => sum + Number(item.price), 0);
 
   document.getElementById("paymentAmount").innerText = "₹" + total;
 
-  generatePaymentQR();
+  const customerDetails = document.getElementById("customerDetails");
 
-  document.getElementById("payment").scrollIntoView({ behavior: "smooth" });
+  if (!customerDetails) {
+    alert("Customer Details section not found!");
+    return;
+  }
+
+  document.getElementById("cartBox").classList.remove("active");
+
+  window.location.hash = "customerDetails";
+
+  window.scrollTo({
+    top: customerDetails.offsetTop - 100,
+    behavior: "instant",
+  });
 }
 
 function enquire(productName) {
@@ -172,3 +180,71 @@ function filterProducts(category) {
     behavior: "smooth",
   });
 }
+
+document
+  .getElementById("customerForm")
+  .addEventListener("submit", async function (event) {
+    event.preventDefault();
+
+    if (cart.length === 0) {
+      alert("Please add a product to your cart first!");
+      return;
+    }
+
+    const customerName = document.getElementById("customerName").value.trim();
+    const phone = document.getElementById("customerPhone").value.trim();
+    const address = document.getElementById("customerAddress").value.trim();
+
+    const order = {
+      customerName: customerName,
+      phone: phone,
+      address: address,
+      productNames: cart.map((item) => item.name).join(", "),
+      totalAmount: cart.reduce((total, item) => total + Number(item.price), 0),
+    };
+
+    try {
+      const response = await fetch("http://localhost:8080/api/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(order),
+      });
+
+      if (!response.ok) {
+        throw new Error("Order could not be saved.");
+      }
+
+      const savedOrder = await response.json();
+
+      const orderDetails = {
+        id: savedOrder.id,
+        amount: savedOrder.totalAmount,
+      };
+
+      sessionStorage.setItem("lastOrder", JSON.stringify(orderDetails));
+
+      window.location.href =
+        "order-confirmation.html?orderId=" + encodeURIComponent(savedOrder.id);
+
+      // Open the order tracking page
+      const trackButton = confirm("Would you like to track your order now?");
+
+      if (trackButton) {
+        window.location.href =
+          "track-order.html?orderId=" + encodeURIComponent(savedOrder.id);
+      }
+
+      cart = [];
+      updateCart();
+      document.getElementById("customerForm").reset();
+
+      cart = [];
+      updateCart();
+      document.getElementById("customerForm").reset();
+    } catch (error) {
+      alert("Order failed to submit. Please check the backend and try again.");
+      console.error(error);
+    }
+  });

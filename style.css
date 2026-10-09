@@ -613,4 +613,63 @@ footer p {
   .all-products-btn:hover {
     transform: translateY(-3px);
   }
+
+  /* Customer Details Form */
+  #customerDetails {
+    padding: 60px 20px;
+    max-width: 650px;
+    margin: 0 auto;
+    scroll-margin-top: 100px;
+  }
+
+  #customerDetails h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    color: #33251f;
+  }
+
+  #customerForm {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: #ffffff;
+    padding: 25px;
+    border: 1px solid #eadbd0;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(80, 50, 30, 0.08);
+  }
+
+  #customerForm input,
+  #customerForm textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #d8c6b9;
+    border-radius: 8px;
+    font: inherit;
+  }
+
+  #customerForm textarea {
+    min-height: 100px;
+    resize: vertical;
+  }
+
+  #customerForm button {
+    padding: 14px;
+    background: #33251f;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+  }
+
+  #customerDetails {
+    display: block !important;
+    position: relative !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    height: auto !important;
+    min-height: 300px;
+    padding: 60px 20px;
+    scroll-margin-top: 100px;
+  }
 }
