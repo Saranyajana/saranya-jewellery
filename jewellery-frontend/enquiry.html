@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Customer Enquiry - Saranya Jewellery</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        padding: 20px;
+        font-family: Arial, sans-serif;
+        background: #fffaf3;
+        color: #333;
+      }
+
+      .container {
+        max-width: 550px;
+        margin: 35px auto;
+        padding: 25px;
+        background: white;
+        border: 1px solid #e5d6b5;
+        border-radius: 12px;
+      }
+
+      h1 {
+        color: #8b6914;
+        text-align: center;
+      }
+
+      label {
+        display: block;
+        margin-top: 15px;
+      }
+
+      input,
+      textarea,
+      button {
+        width: 100%;
+        padding: 12px;
+        margin-top: 7px;
+        font: inherit;
+        border-radius: 6px;
+      }
+
+      input,
+      textarea {
+        border: 1px solid #ccc;
+      }
+
+      textarea {
+        min-height: 120px;
+        resize: vertical;
+      }
+
+      button {
+        margin-top: 20px;
+        background: #8b6914;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+
+      button:disabled {
+        opacity: 0.6;
+      }
+
+      #result {
+        overflow-wrap: anywhere;
+      }
+
+      a {
+        color: #8b6914;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="container">
+      <h1>Customer Enquiry</h1>
+      <p>Have a question about our jewellery? Send us an enquiry.</p>
+
+      <form id="enquiryForm">
+        <label for="name">Your Name *</label>
+        <input id="name" name="name" maxlength="100" required />
+
+        <label for="phone">Phone Number *</label>
+        <input id="phone" name="phone" type="tel" maxlength="20" required />
+
+        <label for="email">Email (optional)</label>
+        <input id="email" name="email" type="email" maxlength="150" />
+
+        <label for="message">Your Enquiry *</label>
+        <textarea
+          id="message"
+          name="message"
+          maxlength="2000"
+          required
+        ></textarea>
+
+        <button id="submitButton" type="submit">Submit Enquiry</button>
+      </form>
+
+      <p id="result" role="status" aria-live="polite"></p>
+      <p><a href="index.html">← Back to Home</a></p>
+    </main>
+
+    <script>
+      const API_URL =
+        "https://jewellery-backend-as8i.onrender.com/api/enquiries";
+
+      const form = document.getElementById("enquiryForm");
+      const button = document.getElementById("submitButton");
+      const result = document.getElementById("result");
+
+      form.addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        const enquiry = {
+          name: form.name.value.trim(),
+          phone: form.phone.value.trim(),
+          email: form.email.value.trim(),
+          message: form.message.value.trim(),
+        };
+
+        if (!enquiry.name || !enquiry.phone || !enquiry.message) {
+          result.textContent = "Please fill in all required fields.";
+          return;
+        }
+
+        button.disabled = true;
+        result.textContent = "Submitting your enquiry...";
+
+        try {
+          const response = await fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(enquiry),
+          });
+
+          if (!response.ok) {
+            throw new Error("Submission failed");
+          }
+
+          result.textContent =
+            "Thank you! Your enquiry was submitted successfully.";
+          form.reset();
+        } catch (error) {
+          result.textContent =
+            "Unable to submit right now. Please try again later.";
+        } finally {
+          button.disabled = false;
+        }
+      });
+    </script>
+  </body>
+</html>
