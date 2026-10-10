@@ -54,6 +54,13 @@
     <p id="message">Loading orders...</p>
     <div id="orders"></div>
 
+    <hr />
+
+    <h2>Customer Enquiries</h2>
+    <button onclick="loadEnquiries()">Refresh Enquiries</button>
+    <p id="enquiryMessage">Click Refresh Enquiries to load enquiries.</p>
+    <div id="enquiries"></div>
+
     <script>
       const API_URL = "https://jewellery-backend-as8i.onrender.com/api/orders";
 
@@ -147,6 +154,64 @@
         } catch (error) {
           message.textContent =
             "Unable to load orders. Check backend and login.";
+          message.className = "error";
+        }
+      }
+
+      async function loadEnquiries() {
+        const message = document.getElementById("enquiryMessage");
+        const container = document.getElementById("enquiries");
+
+        message.textContent = "Loading enquiries...";
+        message.className = "";
+        container.replaceChildren();
+
+        try {
+          const response = await fetch(
+            "https://jewellery-backend-as8i.onrender.com/api/enquiries",
+            { headers: authHeaders },
+          );
+
+          if (response.status === 401 || response.status === 403) {
+            throw new Error("Admin login required or access denied.");
+          }
+
+          if (!response.ok) {
+            throw new Error("Could not load enquiries.");
+          }
+
+          const enquiries = await response.json();
+
+          if (enquiries.length === 0) {
+            message.textContent = "No customer enquiries yet.";
+            return;
+          }
+
+          message.textContent = "Total enquiries: " + enquiries.length;
+
+          enquiries.forEach((enquiry) => {
+            const card = document.createElement("div");
+            card.className = "order";
+
+            const details = [
+              "Enquiry ID: " + enquiry.id,
+              "Customer: " + (enquiry.name || ""),
+              "Phone: " + (enquiry.phone || ""),
+              "Email: " + (enquiry.email || "Not provided"),
+              "Message: " + (enquiry.message || ""),
+              "Date: " + (enquiry.createdAt || "Not available"),
+            ];
+
+            details.forEach((detail) => {
+              const line = document.createElement("p");
+              line.textContent = detail;
+              card.appendChild(line);
+            });
+
+            container.appendChild(card);
+          });
+        } catch (error) {
+          message.textContent = error.message || "Unable to load enquiries.";
           message.className = "error";
         }
       }
