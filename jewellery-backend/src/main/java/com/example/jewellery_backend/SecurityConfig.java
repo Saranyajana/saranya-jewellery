@@ -30,29 +30,31 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-    
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOrigins(
-            List.of("http://localhost:5500", "http://127.0.0.1:5500")
-        );
+@Bean
+public CorsConfigurationSource corsConfigurationSource() {
+    CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedMethods(
-            List.of("GET", "POST", "PATCH", "OPTIONS")
-        );
+    config.setAllowedOrigins(List.of(
+        "https://saranyajana.github.io",
+        "http://localhost:5500",
+        "http://127.0.0.1:5500"
+    ));
 
-        config.setAllowedHeaders(
-            List.of("Authorization", "Content-Type")
-        );
+    config.setAllowedMethods(
+        List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
+    );
 
-        UrlBasedCorsConfigurationSource source =
-            new UrlBasedCorsConfigurationSource();
+    config.setAllowedHeaders(List.of("*"));
+    config.setAllowCredentials(false);
 
-        source.registerCorsConfiguration("/**", config);
-        return source;
-    }
+    UrlBasedCorsConfigurationSource source =
+        new UrlBasedCorsConfigurationSource();
+
+    source.registerCorsConfiguration("/**", config);
+    return source;
+}
+
 
     @Bean
     public UserDetailsService userDetailsService(
