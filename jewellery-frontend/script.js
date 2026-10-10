@@ -204,13 +204,16 @@ document
     };
 
     try {
-      const response = await fetch("http://localhost:8080/api/orders", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        "https://jewellery-backend-as8i.onrender.com/api/orders",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(order),
         },
-        body: JSON.stringify(order),
-      });
+      );
 
       if (!response.ok) {
         throw new Error("Order could not be saved.");
