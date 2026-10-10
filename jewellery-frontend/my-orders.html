@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Orders - Saranya Jewellery</title>
+
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        padding: 20px;
+        font-family: Arial, sans-serif;
+        background: #fffaf3;
+        color: #333;
+      }
+
+      .container {
+        max-width: 850px;
+        margin: 25px auto;
+      }
+
+      h1 {
+        color: #8b6914;
+        text-align: center;
+      }
+
+      .search,
+      .order {
+        background: white;
+        padding: 20px;
+        margin: 18px 0;
+        border: 1px solid #e5d6b5;
+        border-radius: 10px;
+      }
+
+      input,
+      button {
+        width: 100%;
+        padding: 12px;
+        margin-top: 10px;
+        border-radius: 6px;
+        font-size: 16px;
+      }
+
+      input {
+        border: 1px solid #ccc;
+      }
+
+      button {
+        border: none;
+        background: #8b6914;
+        color: white;
+        cursor: pointer;
+      }
+
+      button:disabled {
+        opacity: 0.6;
+        cursor: wait;
+      }
+
+      .message {
+        margin: 15px 0;
+      }
+      .error {
+        color: #b00020;
+      }
+      .success {
+        color: #176b35;
+      }
+
+      .status {
+        display: inline-block;
+        padding: 6px 10px;
+        background: #f5e8c9;
+        border-radius: 5px;
+        font-weight: bold;
+      }
+
+      a {
+        color: #8b6914;
+      }
+
+      @media (max-width: 500px) {
+        body {
+          padding: 10px;
+        }
+        .container {
+          margin: 10px auto;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <h1>My Orders</h1>
+      <p style="text-align: center">
+        View your previous and current jewellery orders.
+      </p>
+
+      <div class="search">
+        <label for="phone">Enter the phone number used for your order</label>
+        <input
+          type="tel"
+          id="phone"
+          placeholder="Enter phone number"
+          autocomplete="tel"
+          required
+        />
+        <button id="searchButton" type="button">View My Orders</button>
+        <p id="message" class="message" aria-live="polite"></p>
+      </div>
+
+      <div id="orders"></div>
+
+      <p><a href="index.html">← Back to Home</a></p>
+    </div>
+
+    <script>
+      const API_URL =
+        "https://jewellery-backend-as8i.onrender.com/api/orders/my-orders";
+
+      const phoneInput = document.getElementById("phone");
+      const searchButton = document.getElementById("searchButton");
+      const message = document.getElementById("message");
+      const ordersContainer = document.getElementById("orders");
+
+      searchButton.addEventListener("click", loadMyOrders);
+
+      async function loadMyOrders() {
+        const phone = phoneInput.value.trim();
+
+        ordersContainer.replaceChildren();
+        message.className = "message";
+
+        if (!phone) {
+          message.textContent = "Please enter your phone number.";
+          message.classList.add("error");
+          return;
+        }
+
+        searchButton.disabled = true;
+        message.textContent = "Loading your orders...";
+
+        try {
+          const response = await fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ phone: phone }),
+          });
+
+          if (!response.ok) {
+            throw new Error("Could not retrieve orders. Please try again.");
+          }
+
+          const orders = await response.json();
+
+          if (!Array.isArray(orders) || orders.length === 0) {
+            message.textContent = "No orders found for this phone number.";
+            return;
+          }
+
+          message.textContent = "Total orders found: " + orders.length;
+          message.classList.add("success");
+
+          orders.forEach((order) => {
+            const card = document.createElement("section");
+            card.className = "order";
+
+            const heading = document.createElement("h2");
+            heading.textContent = "Order #" + order.id;
+            card.appendChild(heading);
+
+            const details = [
+              ["Date", order.orderDate],
+              ["Products", order.productNames],
+              [
+                "Amount",
+                order.totalAmount == null
+                  ? "Not available"
+                  : "₹" + order.totalAmount,
+              ],
+            ];
+
+            details.forEach(([label, value]) => {
+              const p = document.createElement("p");
+              p.textContent =
+                label +
+                ": " +
+                (value == null || value === "" ? "Not available" : value);
+              card.appendChild(p);
+            });
+
+            const status = document.createElement("p");
+            status.textContent = "Status: " + (order.status || "PENDING");
+            status.className = "status";
+            card.appendChild(status);
+
+            const trackLink = document.createElement("p");
+            const link = document.createElement("a");
+            link.href =
+              "track-order.html?orderId=" + encodeURIComponent(order.id);
+            link.textContent = "Track this order";
+            trackLink.appendChild(link);
+            card.appendChild(trackLink);
+
+            ordersContainer.appendChild(card);
+          });
+        } catch (error) {
+          message.textContent =
+            "Unable to load orders. Please try again later.";
+          message.classList.add("error");
+        } finally {
+          searchButton.disabled = false;
+        }
+      }
+    </script>
+  </body>
+</html>
