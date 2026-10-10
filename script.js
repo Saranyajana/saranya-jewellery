@@ -181,6 +181,7 @@ function filterProducts(category) {
   });
 }
 
+
 document
   .getElementById("customerForm")
   .addEventListener("submit", async function (event) {
@@ -200,54 +201,47 @@ document
       phone: phone,
       address: address,
       productNames: cart.map((item) => item.name).join(", "),
-      totalAmount: cart.reduce((total, item) => total + Number(item.price), 0),
+      totalAmount: cart.reduce(
+        (total, item) => total + Number(item.price),
+        0
+      ),
     };
 
- 
-try {
-  const response = await fetch(
-    "https://jewellery-backend-as8i.onrender.com/api/orders",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(order),
-    }
-  );
+    try {
+      const response = await fetch(
+        "https://jewellery-backend-as8i.onrender.com/api/orders",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(order),
+        }
+      );
 
-  if (!response.ok) {
-    throw new Error("Order could not be saved.");
-  }
-
-  const savedOrder = await response.json();
-
-  const orderDetails = {
-    id: savedOrder.id,
-    amount: savedOrder.totalAmount,
-  };
-
-
-      sessionStorage.setItem("lastOrder", JSON.stringify(orderDetails));
-
-      window.location.href =
-        "order-confirmation.html?orderId=" + encodeURIComponent(savedOrder.id);
-
-      // Open the order tracking page
-      const trackButton = confirm("Would you like to track your order now?");
-
-      if (trackButton) {
-        window.location.href =
-          "track-order.html?orderId=" + encodeURIComponent(savedOrder.id);
+      if (!response.ok) {
+        throw new Error("Order could not be saved.");
       }
 
-      cart = [];
-      updateCart();
-      document.getElementById("customerForm").reset();
+      const savedOrder = await response.json();
+
+      const orderDetails = {
+        id: savedOrder.id,
+        amount: savedOrder.totalAmount,
+      };
+
+      sessionStorage.setItem(
+        "lastOrder",
+        JSON.stringify(orderDetails)
+      );
 
       cart = [];
       updateCart();
       document.getElementById("customerForm").reset();
+
+      window.location.href =
+        "order-confirmation.html?orderId=" +
+        encodeURIComponent(savedOrder.id);
     } catch (error) {
       alert("Order failed to submit. Please check the backend and try again.");
       console.error(error);
