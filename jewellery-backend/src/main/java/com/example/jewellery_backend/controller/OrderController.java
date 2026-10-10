@@ -64,11 +64,12 @@ public Map<String, Object> trackOrder(
     return result;
 }
     // Customer: Create order
-    @PostMapping
-    public Order createOrder(@RequestBody Order order) {
-        order.setStatus("PENDING");
-        return orderRepository.save(order);
-    }
+@PostMapping
+public Order createOrder(@RequestBody Order order) {
+    order.setStatus("PENDING");
+    order.setPaymentStatus("PENDING");
+    return orderRepository.save(order);
+}
 
     // Customer: View order history by phone number
     @PostMapping("/my-orders")
@@ -113,6 +114,28 @@ public Map<String, Object> trackOrder(
         }
 
         order.setStatus(newStatus);
+        return orderRepository.save(order);
+    }
+ // Admin: Update payment status after manual verification
+    @PatchMapping("/{id}/payment-status")
+    public Order updatePaymentStatus(
+            @PathVariable Long id,
+            @RequestParam String paymentStatus) {
+
+        Order order = orderRepository.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND, "Order not found"
+            ));
+
+        String newPaymentStatus = paymentStatus.trim().toUpperCase();
+
+        if (!Set.of("PENDING", "PAID").contains(newPaymentStatus)) {
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST, "Invalid payment status"
+            );
+        }
+
+        order.setPaymentStatus(newPaymentStatus);
         return orderRepository.save(order);
     }
 }

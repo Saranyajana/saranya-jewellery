@@ -17,6 +17,7 @@ public class Order {
     private String productNames;
     private double totalAmount;
     private String status = "PENDING";
+    private String paymentStatus = "PENDING";
     private LocalDateTime orderDate = LocalDateTime.now();
 
     public Order() {
@@ -73,7 +74,13 @@ public class Order {
     public void setStatus(String status) {
         this.status = status;
     }
+    public String getPaymentStatus() {
+        return paymentStatus;
+    }
 
+    public void setPaymentStatus(String paymentStatus) {
+        this.paymentStatus = paymentStatus;
+    }
     public LocalDateTime getOrderDate() {
         return orderDate;
     }
