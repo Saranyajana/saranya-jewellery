@@ -70,6 +70,23 @@ public Map<String, Object> trackOrder(
         return orderRepository.save(order);
     }
 
+    // Customer: View order history by phone number
+    @PostMapping("/my-orders")
+    public List<Order> getMyOrders(
+            @RequestBody Map<String, String> request) {
+
+        String phone = request.get("phone");
+
+        if (phone == null || phone.isBlank()) {
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "Phone number is required"
+            );
+        }
+
+        return orderRepository.findByPhoneOrderByIdDesc(phone.trim());
+    }
+
     // Admin: View all orders
     @GetMapping
     public List<Order> getAllOrders() {
