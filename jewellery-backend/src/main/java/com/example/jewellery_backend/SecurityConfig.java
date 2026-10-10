@@ -105,8 +105,16 @@ public SecurityFilterChain securityFilterChain(
                 "/api/orders/**"
             ).hasRole("ADMIN")
 
-            .requestMatchers("/admin.html").hasRole("ADMIN")
-            .anyRequest().permitAll()
+
+.requestMatchers("/admin.html").hasRole("ADMIN")
+
+.requestMatchers(
+    HttpMethod.GET,
+    "/api/enquiries"
+).hasRole("ADMIN")
+
+.anyRequest().permitAll()
+
         )
         .httpBasic(basic -> {});
 
