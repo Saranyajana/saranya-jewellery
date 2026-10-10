@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Order Confirmed - Saranya Jewellery</title>
+
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #fff8f2;
+        color: #38251f;
+      }
+
+      header {
+        background: #702b3b;
+        color: white;
+        text-align: center;
+        padding: 22px;
+      }
+
+      .confirmation {
+        max-width: 500px;
+        margin: 45px auto;
+        padding: 30px 22px;
+        background: white;
+        border-radius: 14px;
+        box-shadow: 0 4px 18px #00000012;
+        text-align: center;
+      }
+
+      .success-icon {
+        width: 70px;
+        height: 70px;
+        margin: 0 auto 18px;
+        border-radius: 50%;
+        background: #e3f5e9;
+        color: #217747;
+        font-size: 38px;
+        line-height: 70px;
+      }
+
+      h2 {
+        color: #702b3b;
+      }
+
+      .details {
+        margin: 25px 0;
+        padding: 18px;
+        background: #fff8f2;
+        border-radius: 8px;
+      }
+
+      .details p {
+        margin: 10px 0;
+      }
+
+      .button {
+        display: block;
+        width: 100%;
+        padding: 13px;
+        margin-top: 12px;
+        border: none;
+        border-radius: 6px;
+        background: #702b3b;
+        color: white;
+        font-size: 16px;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      .secondary {
+        background: white;
+        color: #702b3b;
+        border: 1px solid #702b3b;
+      }
+
+      .note {
+        color: #725d55;
+        font-size: 13px;
+        line-height: 1.5;
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <h1>Saranya Jewellery</h1>
+    </header>
+
+    <main class="confirmation">
+      <div class="success-icon" aria-hidden="true">✓</div>
+
+      <h2>Order Placed Successfully!</h2>
+      <p>Thank you for shopping with Saranya Jewellery.</p>
+
+      <div class="details">
+        <p><strong>Order ID:</strong> <span id="orderId">-</span></p>
+        <p><strong>Order Amount:</strong> <span id="amount">-</span></p>
+        <p><strong>Order Status:</strong> PENDING</p>
+      </div>
+
+      <p class="note">
+        Your order has been received. Please keep your Order ID to check the
+        latest status.
+      </p>
+
+      <button class="button" id="trackButton">Track My Order</button>
+
+      <a class="button secondary" href="index.html"> Continue Shopping </a>
+    </main>
+
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      const orderId = params.get("orderId");
+
+      const saved = sessionStorage.getItem("lastOrder");
+      let order = null;
+
+      try {
+        order = saved ? JSON.parse(saved) : null;
+      } catch {
+        order = null;
+      }
+
+      if (!orderId || !order || String(order.id) !== orderId) {
+        document.querySelector(".confirmation").textContent =
+          "Order details are unavailable. Please check your order history or contact the shop.";
+      } else {
+        document.getElementById("orderId").textContent = orderId;
+        document.getElementById("amount").textContent =
+          "₹" + Number(order.amount).toFixed(2);
+
+        document
+          .getElementById("trackButton")
+          .addEventListener("click", function () {
+            window.location.href =
+              "track-order.html?orderId=" + encodeURIComponent(orderId);
+          });
+      }
+    </script>
+  </body>
+</html>
