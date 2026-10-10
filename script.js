@@ -203,25 +203,30 @@ document
       totalAmount: cart.reduce((total, item) => total + Number(item.price), 0),
     };
 
-    try {
-      const response = await fetch("https://jewellery-backend-as8i.onrender.com/api/orders", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(order),
-      });
+ 
+try {
+  const response = await fetch(
+    "https://jewellery-backend-as8i.onrender.com/api/orders",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(order),
+    }
+  );
 
-      if (!response.ok) {
-        throw new Error("Order could not be saved.");
-      }
+  if (!response.ok) {
+    throw new Error("Order could not be saved.");
+  }
 
-      const savedOrder = await response.json();
+  const savedOrder = await response.json();
 
-      const orderDetails = {
-        id: savedOrder.id,
-        amount: savedOrder.totalAmount,
-      };
+  const orderDetails = {
+    id: savedOrder.id,
+    amount: savedOrder.totalAmount,
+  };
+
 
       sessionStorage.setItem("lastOrder", JSON.stringify(orderDetails));
 
