@@ -54,6 +54,13 @@
     <p id="message">Loading orders...</p>
     <div id="orders"></div>
 
+    <hr />
+
+    <h2>Customer Enquiries</h2>
+    <button onclick="loadEnquiries()">Refresh Enquiries</button>
+    <p id="enquiryMessage">Click Refresh Enquiries to load enquiries.</p>
+    <div id="enquiries"></div>
+
     <script>
       const API_URL = "https://jewellery-backend-as8i.onrender.com/api/orders";
 
@@ -103,6 +110,7 @@
               "Products: " + order.productNames,
               "Amount: ₹" + order.totalAmount,
               "Current status: " + order.status,
+              "Payment status: " + (order.paymentStatus || "PENDING"),
               "Date: " + order.orderDate,
             ];
 
@@ -142,11 +150,96 @@
             card.appendChild(label);
             card.appendChild(select);
             card.appendChild(updateButton);
+
+            // Payment status controls
+            const paymentLabel = document.createElement("label");
+            paymentLabel.textContent = " Payment status: ";
+
+            const paymentSelect = document.createElement("select");
+
+            ["PENDING", "PAID"].forEach((paymentStatus) => {
+              const option = document.createElement("option");
+              option.value = paymentStatus;
+              option.textContent = paymentStatus;
+              paymentSelect.appendChild(option);
+            });
+
+            paymentSelect.value = order.paymentStatus || "PENDING";
+
+            const paymentButton = document.createElement("button");
+            paymentButton.textContent = "Update Payment Status";
+
+            paymentButton.addEventListener("click", async () => {
+              await updatePaymentStatus(order.id, paymentSelect.value);
+            });
+
+            card.appendChild(paymentLabel);
+            card.appendChild(paymentSelect);
+            card.appendChild(paymentButton);
+
             container.appendChild(card);
           });
         } catch (error) {
           message.textContent =
             "Unable to load orders. Check backend and login.";
+          message.className = "error";
+        }
+      }
+
+      async function loadEnquiries() {
+        const message = document.getElementById("enquiryMessage");
+        const container = document.getElementById("enquiries");
+
+        message.textContent = "Loading enquiries...";
+        message.className = "";
+        container.replaceChildren();
+
+        try {
+          const response = await fetch(
+            "https://jewellery-backend-as8i.onrender.com/api/enquiries",
+            { headers: authHeaders },
+          );
+
+          if (response.status === 401 || response.status === 403) {
+            throw new Error("Admin login required or access denied.");
+          }
+
+          if (!response.ok) {
+            throw new Error("Could not load enquiries.");
+          }
+
+          const enquiries = await response.json();
+
+          if (enquiries.length === 0) {
+            message.textContent = "No customer enquiries yet.";
+            return;
+          }
+
+          message.textContent = "Total enquiries: " + enquiries.length;
+
+          enquiries.forEach((enquiry) => {
+            const card = document.createElement("div");
+            card.className = "order";
+
+            const details = [
+              "Enquiry ID: " + enquiry.id,
+              "Customer: " + (enquiry.name || ""),
+              "Phone: " + (enquiry.phone || ""),
+              "Email: " + (enquiry.email || "Not provided"),
+              "Message: " + (enquiry.message || ""),
+              "Date: " + (enquiry.createdAt || "Not available"),
+            ];
+
+            details.forEach((detail) => {
+              const line = document.createElement("p");
+              line.textContent = detail;
+              card.appendChild(line);
+            });
+
+            container.appendChild(card);
+          });
+        } catch (error) {
+          message.textContent = error.message || "Unable to load enquiries.";
           message.className = "error";
         }
       }
@@ -174,6 +267,38 @@
           }
 
           message.textContent = `Order #${orderId} status updated to ${status}.`;
+          message.className = "success";
+
+          await loadOrders();
+        } catch (error) {
+          message.textContent = error.message;
+          message.className = "error";
+        }
+      }
+
+      async function updatePaymentStatus(orderId, paymentStatus) {
+        const message = document.getElementById("message");
+        message.textContent = "Updating payment status...";
+        message.className = "";
+
+        try {
+          const response = await fetch(
+            `${API_URL}/${orderId}/payment-status?paymentStatus=${encodeURIComponent(paymentStatus)}`,
+            {
+              method: "PATCH",
+              headers: authHeaders,
+            },
+          );
+
+          if (response.status === 401 || response.status === 403) {
+            throw new Error("Admin login required or access denied.");
+          }
+
+          if (!response.ok) {
+            throw new Error("Payment status update failed.");
+          }
+
+          message.textContent = `Order #${orderId} payment status updated to ${paymentStatus}.`;
           message.className = "success";
 
           await loadOrders();

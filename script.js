@@ -68,21 +68,13 @@ function checkout() {
 
   document.getElementById("paymentAmount").innerText = "₹" + total;
 
-  const customerDetails = document.getElementById("customerDetails");
-
-  if (!customerDetails) {
-    alert("Customer Details section not found!");
-    return;
-  }
-
   document.getElementById("cartBox").classList.remove("active");
 
-  window.location.hash = "customerDetails";
-
-  window.scrollTo({
-    top: customerDetails.offsetTop - 100,
-    behavior: "instant",
+  document.getElementById("payment").scrollIntoView({
+    behavior: "smooth",
   });
+
+  generatePaymentQR();
 }
 
 function enquire(productName) {
@@ -181,7 +173,6 @@ function filterProducts(category) {
   });
 }
 
-
 document
   .getElementById("customerForm")
   .addEventListener("submit", async function (event) {
@@ -201,10 +192,7 @@ document
       phone: phone,
       address: address,
       productNames: cart.map((item) => item.name).join(", "),
-      totalAmount: cart.reduce(
-        (total, item) => total + Number(item.price),
-        0
-      ),
+      totalAmount: cart.reduce((total, item) => total + Number(item.price), 0),
     };
 
     try {
@@ -216,7 +204,7 @@ document
             "Content-Type": "application/json",
           },
           body: JSON.stringify(order),
-        }
+        },
       );
 
       if (!response.ok) {
@@ -230,18 +218,14 @@ document
         amount: savedOrder.totalAmount,
       };
 
-      sessionStorage.setItem(
-        "lastOrder",
-        JSON.stringify(orderDetails)
-      );
+      sessionStorage.setItem("lastOrder", JSON.stringify(orderDetails));
 
       cart = [];
       updateCart();
       document.getElementById("customerForm").reset();
 
       window.location.href =
-        "order-confirmation.html?orderId=" +
-        encodeURIComponent(savedOrder.id);
+        "order-confirmation.html?orderId=" + encodeURIComponent(savedOrder.id);
     } catch (error) {
       alert("Order failed to submit. Please check the backend and try again.");
       console.error(error);
