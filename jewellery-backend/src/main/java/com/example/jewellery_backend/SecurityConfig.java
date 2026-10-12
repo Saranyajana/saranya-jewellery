@@ -113,6 +113,11 @@ public SecurityFilterChain securityFilterChain(
     "/api/enquiries"
 ).hasRole("ADMIN")
 
+.requestMatchers(
+    org.springframework.http.HttpMethod.GET,
+    "/actuator/health"
+).permitAll()
+
 .anyRequest().permitAll()
 
         )
