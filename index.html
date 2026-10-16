@@ -129,6 +129,31 @@
     </section>
     <!-- PRODUCTS -->
     <section id="products" class="product-section">
+      <!-- PRODUCT SEARCH AND FILTERS -->
+      <div class="product-toolbar">
+        <input
+          type="search"
+          id="productSearch"
+          placeholder="Search jewellery..."
+          aria-label="Search jewellery"
+        />
+
+        <select id="priceFilter" aria-label="Filter by price">
+          <option value="all">All Prices</option>
+          <option value="1">₹1 products</option>
+        </select>
+
+        <select id="productSort" aria-label="Sort products">
+          <option value="default">Sort: Default</option>
+          <option value="name-asc">Name: A to Z</option>
+          <option value="name-desc">Name: Z to A</option>
+          <option value="price-low">Price: Low to High</option>
+          <option value="price-high">Price: High to Low</option>
+        </select>
+      </div>
+
+      <p id="productResultCount" aria-live="polite"></p>
+
       <div class="product-container">
         <!-- 1. Diamond Ring -->
         <div class="product-card ring">
@@ -139,6 +164,19 @@
           />
 
           <h3>Diamond Ring</h3>
+
+          <div class="product-rating" aria-label="No customer ratings yet">
+            <span class="rating-stars">☆☆☆☆☆</span>
+            <span class="rating-text">No reviews yet</span>
+          </div>
+
+          <button
+            type="button"
+            class="write-review-btn"
+            onclick="openReviewForm(this)"
+          >
+            Write a Review
+          </button>
 
           <p>Modern Collection</p>
 
@@ -160,6 +198,18 @@
           />
 
           <h3>Gold Necklace</h3>
+          <div class="product-rating" aria-label="No customer ratings yet">
+            <span class="rating-stars">☆☆☆☆☆</span>
+            <span class="rating-text">No reviews yet</span>
+          </div>
+
+          <button
+            type="button"
+            class="write-review-btn"
+            onclick="openReviewForm(this)"
+          >
+            Write a Review
+          </button>
 
           <p>Traditional Collection</p>
 
@@ -181,7 +231,18 @@
           />
 
           <h3>Diamond Earrings</h3>
+          <div class="product-rating" aria-label="No customer ratings yet">
+            <span class="rating-stars">☆☆☆☆☆</span>
+            <span class="rating-text">No reviews yet</span>
+          </div>
 
+          <button
+            type="button"
+            class="write-review-btn"
+            onclick="openReviewForm(this)"
+          >
+            Write a Review
+          </button>
           <p>Modern Collection</p>
 
           <h4>₹1</h4>
@@ -204,7 +265,18 @@
           />
 
           <h3>Bridal Necklace</h3>
+          <div class="product-rating" aria-label="No customer ratings yet">
+            <span class="rating-stars">☆☆☆☆☆</span>
+            <span class="rating-text">No reviews yet</span>
+          </div>
 
+          <button
+            type="button"
+            class="write-review-btn"
+            onclick="openReviewForm(this)"
+          >
+            Write a Review
+          </button>
           <p>Bridal Collection</p>
 
           <h4>₹1</h4>
@@ -225,7 +297,17 @@
           />
 
           <h3>Bridal Jewellery Set</h3>
-
+          <div class="product-rating" aria-label="No customer ratings yet">
+            <span class="rating-stars">☆☆☆☆☆</span>
+            <span class="rating-text">No reviews yet</span>
+          </div>
+          <button
+            type="button"
+            class="write-review-btn"
+            onclick="openReviewForm(this)"
+          >
+            Write a Review
+          </button>
           <p>Bridal Collection</p>
 
           <h4>₹1</h4>
@@ -248,7 +330,17 @@
           />
 
           <h3>Gold Bracelet</h3>
-
+          <div class="product-rating" aria-label="No customer ratings yet">
+            <span class="rating-stars">☆☆☆☆☆</span>
+            <span class="rating-text">No reviews yet</span>
+          </div>
+          <button
+            type="button"
+            class="write-review-btn"
+            onclick="openReviewForm(this)"
+          >
+            Write a Review
+          </button>
           <p>Daily Wear Collection</p>
 
           <h4>₹1</h4>
