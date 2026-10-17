@@ -11,4 +11,9 @@ public interface ProductReviewRepository
 
     List<ProductReview> findByProductNameIgnoreCaseOrderByCreatedAtDesc(
             String productName);
+
+    boolean existsByProductNameIgnoreCaseAndCustomerNameIgnoreCaseAndReviewTextIgnoreCase(
+            String productName,
+            String customerName,
+            String reviewText);
 }

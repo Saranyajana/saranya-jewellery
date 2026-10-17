@@ -1,4 +1,3 @@
-
 package com.example.jewellery_backend.controller;
 
 import com.example.jewellery_backend.entity.ProductReview;
@@ -44,6 +43,23 @@ public class ProductReviewController {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "Review details exceed the allowed length");
+        }
+        
+        String normalizedReviewText = review.getReviewText() == null
+                ? ""
+                : review.getReviewText().trim();
+
+        boolean duplicate = !normalizedReviewText.isBlank()
+                && reviewRepository
+                        .existsByProductNameIgnoreCaseAndCustomerNameIgnoreCaseAndReviewTextIgnoreCase(
+                                review.getProductName().trim(),
+                                review.getCustomerName().trim(),
+                                normalizedReviewText);
+
+        if (duplicate) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "You have already submitted this review");
         }
 
         ProductReview newReview = new ProductReview();
