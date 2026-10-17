@@ -1,5 +1,7 @@
 package com.example.jewellery_backend.controller;
 
+import com.example.jewellery_backend.ReviewRateLimiter;
+import jakarta.servlet.http.HttpServletRequest;
 import com.example.jewellery_backend.entity.ProductReview;
 import com.example.jewellery_backend.repository.ProductReviewRepository;
 import org.springframework.http.HttpStatus;
@@ -14,16 +16,30 @@ import java.util.List;
 public class ProductReviewController {
 
     private final ProductReviewRepository reviewRepository;
+    private final ReviewRateLimiter reviewRateLimiter;
 
     public ProductReviewController(
-            ProductReviewRepository reviewRepository) {
+            ProductReviewRepository reviewRepository,
+            ReviewRateLimiter reviewRateLimiter) {
         this.reviewRepository = reviewRepository;
+        this.reviewRateLimiter = reviewRateLimiter;
     }
 
     @PostMapping
     public ProductReview createReview(
-            @RequestBody ProductReview review) {
+            @RequestBody ProductReview review,
+            HttpServletRequest request) {
+    	String clientKey = request.getRemoteAddr();
 
+    	if (clientKey == null || clientKey.isBlank()) {
+    	    clientKey = "unknown-client";
+    	}
+
+    	if (!reviewRateLimiter.allowRequest(clientKey)) {
+    	    throw new ResponseStatusException(
+    	            HttpStatus.TOO_MANY_REQUESTS,
+    	            "Too many review submissions. Please try again later.");
+    	}
         if (review.getProductName() == null
                 || review.getProductName().isBlank()
                 || review.getCustomerName() == null

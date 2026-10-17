@@ -368,9 +368,26 @@ function openReviewForm(button) {
     .then((data) => {
       alert("Review saved successfully! Review ID: " + data.id);
     })
+
     .catch((error) => {
       console.error("Review save error:", error);
-      alert("Review save aagala. Local backend running-a nu check pannu.");
+
+      let message = error.message || "Unknown error";
+
+      try {
+        const details = JSON.parse(message);
+
+        if (details.status === 409) {
+          message = "Indha review already submit pannirukkeenga.";
+        } else if (details.status === 400) {
+          message =
+            "Review details invalid. Rating, name and length check pannunga.";
+        }
+      } catch (e) {
+        // Error JSON format-la illaina original message use pannuvom.
+      }
+
+      alert("Review save aagala: " + message);
     });
 }
 
