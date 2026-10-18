@@ -231,3 +231,142 @@ document
       console.error(error);
     }
   });
+
+function openReviewForm(button) {
+  const productCard = button.closest(".product-card");
+
+  if (!productCard) {
+    alert("Product details not found.");
+    return;
+  }
+
+  const productName =
+    productCard.querySelector("h3")?.textContent.trim() ||
+    productCard.dataset.name ||
+    "Product";
+
+  const customerName = prompt("Enter your name:");
+  if (!customerName || !customerName.trim()) return;
+
+  const rating = prompt("Enter rating from 1 to 5:");
+  if (!rating || !/^[1-5]$/.test(rating.trim())) {
+    alert("Please enter a rating from 1 to 5.");
+    return;
+  }
+
+  const reviewText = prompt("Write your review:");
+
+  fetch("https://jewellery-backend-as8i.onrender.com/api/reviews", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      productName: productName,
+      customerName: customerName.trim(),
+      rating: Number(rating),
+      reviewText: reviewText ? reviewText.trim() : "",
+    }),
+  })
+    .then(async (response) => {
+      if (!response.ok) {
+        throw new Error(await response.text());
+      }
+      return response.json();
+    })
+    .then((data) => {
+      alert("Review saved successfully! Review ID: " + data.id);
+      loadProductReviews();
+    })
+
+    .catch((error) => {
+      console.error("Review save error:", error);
+
+      let message = error.message || "Unknown error";
+
+      try {
+        const details = JSON.parse(message);
+
+        if (details.status === 409) {
+          message = "Indha review already submit pannirukkeenga.";
+        } else if (details.status === 400) {
+          message =
+            "Review details invalid. Rating, name and length check pannunga.";
+        }
+      } catch (e) {
+        // Error JSON format-la illaina original message use pannuvom.
+      }
+
+      alert("Review save aagala: " + message);
+    });
+}
+
+async function loadProductReviews() {
+  const productCards = document.querySelectorAll(".product-card");
+
+  for (const card of productCards) {
+    const productName = card.querySelector("h3")?.textContent.trim();
+
+    const ratingSection = card.querySelector(".product-rating");
+
+    if (!productName || !ratingSection) continue;
+
+    try {
+      const response = await fetch(
+        `https://jewellery-backend-as8i.onrender.com/api/reviews/${encodeURIComponent(productName)}`,
+      );
+
+      if (!response.ok) continue;
+
+      const reviews = await response.json();
+
+      if (reviews.length === 0) {
+        ratingSection.querySelector(".rating-stars").textContent = "☆☆☆☆☆";
+        ratingSection.querySelector(".rating-text").textContent =
+          "No reviews yet";
+        continue;
+      }
+
+      const average =
+        reviews.reduce((sum, review) => sum + review.rating, 0) /
+        reviews.length;
+
+      ratingSection.querySelector(".rating-stars").textContent =
+        "★".repeat(Math.round(average)) + "☆".repeat(5 - Math.round(average));
+
+      ratingSection.querySelector(".rating-text").textContent =
+        `${average.toFixed(1)} (${reviews.length} review${reviews.length === 1 ? "" : "s"})`;
+      let reviewContainer = card.querySelector(".customer-reviews");
+
+      if (!reviewContainer) {
+        reviewContainer = document.createElement("div");
+        reviewContainer.className = "customer-reviews";
+        card.appendChild(reviewContainer);
+      }
+
+      reviewContainer.replaceChildren();
+
+      reviews.slice(0, 3).forEach((review) => {
+        const reviewItem = document.createElement("div");
+        reviewItem.className = "customer-review-item";
+
+        const name = document.createElement("strong");
+        name.textContent = review.customerName;
+
+        const text = document.createElement("p");
+        text.textContent = review.reviewText || "No written comment.";
+
+        reviewItem.append(name, text);
+        reviewContainer.appendChild(reviewItem);
+      });
+    } catch (error) {
+      console.error(`Could not load reviews for ${productName}:`, error);
+    }
+  }
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", loadProductReviews);
+} else {
+  loadProductReviews();
+}
