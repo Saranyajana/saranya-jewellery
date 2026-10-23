@@ -673,3 +673,338 @@ footer p {
     scroll-margin-top: 100px;
   }
 }
+
+.all-products-btn {
+  margin-top: 30px;
+  padding: 12px 28px;
+  border: none;
+  border-radius: 25px;
+  background: #2d211b;
+  color: white;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.all-products-btn:hover {
+  transform: translateY(-3px);
+}
+
+/* Product search and filters */
+.product-card[hidden] {
+  display: none !important;
+}
+
+/* ===== Premium Product Search Toolbar ===== */
+
+.product-toolbar {
+  width: min(100% - 40px, 1000px);
+  margin: 0 auto 18px;
+  padding: 16px;
+  display: grid;
+  grid-template-columns: minmax(220px, 2fr) minmax(140px, 1fr) minmax(
+      160px,
+      1fr
+    );
+  gap: 12px;
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #eadfc9;
+  border-radius: 16px;
+  box-shadow: 0 6px 24px rgba(76, 54, 20, 0.07);
+  box-sizing: border-box;
+}
+
+#productSearch,
+#priceFilter,
+#productSort {
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid #ded6c8;
+  border-radius: 10px;
+  background-color: #fffdf9;
+  color: #302719;
+  font: inherit;
+  font-size: 14px;
+  box-sizing: border-box;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+#productSearch {
+  padding-left: 42px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%238b6914' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 14px center;
+  background-size: 19px;
+}
+
+#productSearch::placeholder {
+  color: #958b7b;
+}
+
+#productSearch:focus,
+#priceFilter:focus,
+#productSort:focus {
+  outline: none;
+  border-color: #a78335;
+  box-shadow: 0 0 0 3px rgba(167, 131, 53, 0.14);
+}
+
+#priceFilter,
+#productSort {
+  cursor: pointer;
+}
+
+#productResultCount {
+  width: min(100% - 40px, 1000px);
+  margin: 0 auto 20px;
+  color: #746751;
+  font-size: 14px;
+}
+
+/* Tablet and mobile layout */
+@media (max-width: 700px) {
+  .product-toolbar {
+    grid-template-columns: 1fr 1fr;
+    width: calc(100% - 28px);
+    padding: 12px;
+    gap: 10px;
+    border-radius: 13px;
+  }
+
+  #productSearch {
+    grid-column: 1 / -1;
+  }
+
+  #productSearch,
+  #priceFilter,
+  #productSort {
+    font-size: 13px;
+    min-height: 46px;
+  }
+
+  #productResultCount {
+    width: calc(100% - 28px);
+  }
+}
+
+@media (max-width: 380px) {
+  .product-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  #productSearch {
+    grid-column: auto;
+  }
+}
+
+
+/* Product Ratings */
+.product-rating {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 8px 0 12px;
+  font-family: Arial, sans-serif;
+}
+
+.rating-stars {
+  color: #b8860b;
+  font-size: 18px;
+  letter-spacing: 2px;
+}
+
+.rating-text {
+  color: #81736b;
+  font-size: 12px;
+}
+
+/* Write a Review button */
+.product-card .write-review-btn {
+  display: block;
+  width: 100%;
+  padding: 10px 14px;
+  margin: 8px 0 12px;
+  background: #fffaf5;
+  color: #33251f;
+  border: 1px solid #a56b45;
+  border-radius: 25px;
+  cursor: pointer;
+}
+
+.product-card .write-review-btn:hover {
+  background: #f3e4d8;
+}
+
+/* Customer reviews */
+.customer-reviews {
+  margin-top: 12px;
+  text-align: left;
+}
+
+.customer-review-item {
+  padding: 10px;
+  margin-bottom: 8px;
+  border-top: 1px solid #eaded5;
+}
+
+.customer-review-item strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.customer-review-item p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+#customerDetails {
+  display: block;
+  position: relative;
+  visibility: visible;
+  opacity: 1;
+  height: auto;
+  min-height: 300px;
+  padding: 60px 20px;
+  max-width: 650px;
+  margin: 0 auto;
+  scroll-margin-top: 100px;
+}
+
+#customerDetails h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #33251f;
+}
+
+#customerForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #ffffff;
+  padding: 25px;
+  border: 1px solid #eadbd0;
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(80, 50, 30, 0.08);
+}
+
+#customerForm label {
+  color: #33251f;
+  font-size: 14px;
+}
+
+#customerForm input,
+#customerForm textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #d8c6b9;
+  border-radius: 8px;
+  font: inherit;
+  box-sizing: border-box;
+}
+
+#customerForm textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+#customerForm button {
+  padding: 14px;
+  background: #33251f;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+#customerForm button:hover {
+  background: #a56b45;
+}
+
+/* Product Review Form Modal */
+.review-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.55);
+  overflow-y: auto;
+}
+
+.review-modal-content {
+  width: 100%;
+  max-width: 450px;
+  margin: auto;
+  padding: 28px;
+  background: #fffaf5;
+  border: 1px solid #eadbd0;
+  border-radius: 18px;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.2);
+}
+
+.review-modal-content h2 {
+  margin: 0 0 22px;
+  text-align: center;
+  color: #33251f;
+}
+
+#reviewForm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#reviewForm label {
+  color: #33251f;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+#reviewForm input,
+#reviewForm select,
+#reviewForm textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  border: 1px solid #d8c6b9;
+  border-radius: 8px;
+  background: white;
+  color: #33251f;
+  font: inherit;
+}
+
+#reviewForm textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.review-form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.review-form-actions button {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid #33251f;
+  border-radius: 25px;
+  background: #33251f;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.review-form-actions button:last-child {
+  background: white;
+  color: #33251f;
+}

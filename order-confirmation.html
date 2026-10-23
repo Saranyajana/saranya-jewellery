@@ -85,6 +85,25 @@
         font-size: 13px;
         line-height: 1.5;
       }
+
+      .payment-section {
+        margin: 20px 0;
+        padding: 18px;
+        background: #fff8f2;
+        border-radius: 8px;
+      }
+
+      #qrcode {
+        display: flex;
+        justify-content: center;
+        margin: 15px auto;
+      }
+
+      #qrcode img,
+      #qrcode canvas {
+        max-width: 100%;
+        height: auto;
+      }
     </style>
   </head>
 
@@ -102,6 +121,14 @@
       <div class="details">
         <p><strong>Order ID:</strong> <span id="orderId">-</span></p>
         <p><strong>Order Amount:</strong> <span id="amount">-</span></p>
+
+        <div class="payment-section">
+          <h3>Pay Using UPI</h3>
+          <div id="qrcode"></div>
+          <p class="note">Scan the QR code using your UPI app.</p>
+          <p><strong>UPI ID:</strong> janasaranya45@okicici</p>
+        </div>
+
         <p><strong>Order Status:</strong> PENDING</p>
       </div>
 
@@ -114,6 +141,8 @@
 
       <a class="button secondary" href="index.html"> Continue Shopping </a>
     </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <script>
       const params = new URLSearchParams(window.location.search);
@@ -135,6 +164,26 @@
         document.getElementById("orderId").textContent = orderId;
         document.getElementById("amount").textContent =
           "₹" + Number(order.amount).toFixed(2);
+
+        if (typeof QRCode !== "undefined" && Number(order.amount) > 0) {
+          const upiLink =
+            "upi://pay?pa=" +
+            encodeURIComponent("janasaranya45@okicici") +
+            "&pn=" +
+            encodeURIComponent("Saranya Jewellery") +
+            "&am=" +
+            Number(order.amount).toFixed(2) +
+            "&cu=INR";
+
+          new QRCode(document.getElementById("qrcode"), {
+            text: upiLink,
+            width: 200,
+            height: 200,
+          });
+        } else {
+          document.getElementById("qrcode").textContent =
+            "QR unavailable. Please check your internet connection.";
+        }
 
         document
           .getElementById("trackButton")

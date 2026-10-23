@@ -64,17 +64,11 @@ function checkout() {
     return;
   }
 
-  const total = cart.reduce((sum, item) => sum + Number(item.price), 0);
-
-  document.getElementById("paymentAmount").innerText = "₹" + total;
-
   document.getElementById("cartBox").classList.remove("active");
 
-  document.getElementById("payment").scrollIntoView({
+  document.getElementById("customerDetails").scrollIntoView({
     behavior: "smooth",
   });
-
-  generatePaymentQR();
 }
 
 function enquire(productName) {
@@ -116,16 +110,17 @@ function startPayment() {
 const upiId = "janasaranya45@okicici";
 
 function generatePaymentQR() {
-  let total = 0;
+  let total = Number(
+    JSON.parse(sessionStorage.getItem("lastOrder") || "null")?.amount,
+  );
 
-  cart.forEach(function (item) {
-    total += Number(item.price);
-  });
+  if (!Number.isFinite(total) || total <= 0) {
+    total = cart.reduce((sum, item) => sum + Number(item.price), 0);
+  }
 
   if (total <= 0) {
     total = 1;
   }
-
   const qrContainer = document.getElementById("qrcode");
 
   if (!qrContainer) {
@@ -157,21 +152,113 @@ function generatePaymentQR() {
   }
 }
 
-function filterProducts(category) {
-  const products = document.querySelectorAll(".product-card");
+let selectedCategory = "all";
 
-  products.forEach(function (product) {
-    if (category === "all" || product.classList.contains(category)) {
-      product.style.display = "block";
-    } else {
-      product.style.display = "none";
-    }
-  });
+function filterProducts(category) {
+  selectedCategory = category;
+  applyProductFilters();
 
   document.getElementById("products").scrollIntoView({
     behavior: "smooth",
   });
 }
+
+function applyProductFilters() {
+  const products = Array.from(document.querySelectorAll(".product-card"));
+
+  const searchInput = document.getElementById("productSearch");
+  const priceSelect = document.getElementById("priceFilter");
+  const sortSelect = document.getElementById("productSort");
+
+  const searchText = searchInput ? searchInput.value.trim().toLowerCase() : "";
+
+  const selectedPrice = priceSelect ? priceSelect.value : "all";
+  const sortValue = sortSelect ? sortSelect.value : "default";
+
+  products.sort(function (a, b) {
+    const nameA = a.querySelector("h3").textContent.trim();
+    const nameB = b.querySelector("h3").textContent.trim();
+
+    const priceA = Number(
+      a.querySelector("h4").textContent.replace(/[^\d.]/g, ""),
+    );
+    const priceB = Number(
+      b.querySelector("h4").textContent.replace(/[^\d.]/g, ""),
+    );
+
+    if (sortValue === "name-asc") {
+      return nameA.localeCompare(nameB);
+    }
+
+    if (sortValue === "name-desc") {
+      return nameB.localeCompare(nameA);
+    }
+
+    if (sortValue === "price-low") {
+      return priceA - priceB;
+    }
+
+    if (sortValue === "price-high") {
+      return priceB - priceA;
+    }
+
+    return 0;
+  });
+
+  const container = document.querySelector(".product-container");
+  let visibleCount = 0;
+
+  products.forEach(function (product) {
+    const name = product.querySelector("h3").textContent.toLowerCase();
+    const description = product.querySelector("p").textContent.toLowerCase();
+
+    const matchesCategory =
+      selectedCategory === "all" ||
+      product.classList.contains(selectedCategory);
+
+    const matchesSearch =
+      name.includes(searchText) || description.includes(searchText);
+
+    const price = Number(
+      product.querySelector("h4").textContent.replace(/[^\d.]/g, ""),
+    );
+
+    const matchesPrice =
+      selectedPrice === "all" || price === Number(selectedPrice);
+
+    const isVisible = matchesCategory && matchesSearch && matchesPrice;
+
+    product.hidden = !isVisible;
+
+    if (isVisible) {
+      visibleCount++;
+    }
+
+    container.appendChild(product);
+  });
+
+  const resultCount = document.getElementById("productResultCount");
+
+  if (resultCount) {
+    resultCount.textContent =
+      visibleCount +
+      (visibleCount === 1 ? " product found" : " products found");
+  }
+}
+
+document
+  .getElementById("productSearch")
+  ?.addEventListener("input", applyProductFilters);
+
+document
+  .getElementById("priceFilter")
+  ?.addEventListener("change", applyProductFilters);
+
+document
+  .getElementById("productSort")
+  ?.addEventListener("change", applyProductFilters);
+
+applyProductFilters();
 
 document
   .getElementById("customerForm")
@@ -220,6 +307,9 @@ document
 
       sessionStorage.setItem("lastOrder", JSON.stringify(orderDetails));
 
+      document.getElementById("paymentAmount").innerText =
+        "₹" + savedOrder.totalAmount;
+
       cart = [];
       updateCart();
       document.getElementById("customerForm").reset();
@@ -232,6 +322,8 @@ document
     }
   });
 
+let selectedReviewProduct = "";
+
 function openReviewForm(button) {
   const productCard = button.closest(".product-card");
 
@@ -240,67 +332,31 @@ function openReviewForm(button) {
     return;
   }
 
-  const productName =
+  selectedReviewProduct =
     productCard.querySelector("h3")?.textContent.trim() ||
     productCard.dataset.name ||
     "Product";
 
-  const customerName = prompt("Enter your name:");
-  if (!customerName || !customerName.trim()) return;
-
-  const rating = prompt("Enter rating from 1 to 5:");
-  if (!rating || !/^[1-5]$/.test(rating.trim())) {
-    alert("Please enter a rating from 1 to 5.");
-    return;
-  }
-
-  const reviewText = prompt("Write your review:");
-
-  fetch("https://jewellery-backend-as8i.onrender.com/api/reviews", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      productName: productName,
-      customerName: customerName.trim(),
-      rating: Number(rating),
-      reviewText: reviewText ? reviewText.trim() : "",
-    }),
-  })
-    .then(async (response) => {
-      if (!response.ok) {
-        throw new Error(await response.text());
-      }
-      return response.json();
-    })
-    .then((data) => {
-      alert("Review saved successfully! Review ID: " + data.id);
-      loadProductReviews();
-    })
-
-    .catch((error) => {
-      console.error("Review save error:", error);
-
-      let message = error.message || "Unknown error";
-
-      try {
-        const details = JSON.parse(message);
-
-        if (details.status === 409) {
-          message = "Indha review already submit pannirukkeenga.";
-        } else if (details.status === 400) {
-          message =
-            "Review details invalid. Rating, name and length check pannunga.";
-        }
-      } catch (e) {
-        // Error JSON format-la illaina original message use pannuvom.
-      }
-
-      alert("Review save aagala: " + message);
-    });
+  document.getElementById("reviewForm").reset();
+  document.getElementById("reviewModal").style.display = "flex";
 }
 
+function closeReviewForm() {
+  document.getElementById("reviewModal").style.display = "none";
+  selectedReviewProduct = "";
+}
+
+document
+  .getElementById("cancelReview")
+  .addEventListener("click", closeReviewForm);
+
+document
+  .getElementById("reviewModal")
+  .addEventListener("click", function (event) {
+    if (event.target === this) {
+      closeReviewForm();
+    }
+  });
 async function loadProductReviews() {
   const productCards = document.querySelectorAll(".product-card");
 
@@ -364,6 +420,77 @@ async function loadProductReviews() {
     }
   }
 }
+
+document
+  .getElementById("reviewForm")
+  .addEventListener("submit", async function (event) {
+    event.preventDefault();
+
+    const customerName = document
+      .getElementById("reviewCustomerName")
+      .value.trim();
+
+    const rating = Number(document.getElementById("reviewRating").value);
+
+    const reviewText = document.getElementById("reviewText").value.trim();
+
+    if (!selectedReviewProduct || !customerName || !rating || !reviewText) {
+      alert("Please enter your name, select a rating and write a review.");
+      return;
+    }
+
+    const submitButton = this.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
+    submitButton.textContent = "Submitting...";
+
+    try {
+      const response = await fetch(
+        "https://jewellery-backend-as8i.onrender.com/api/reviews",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            productName: selectedReviewProduct,
+            customerName,
+            rating,
+            reviewText,
+          }),
+        },
+      );
+
+      if (!response.ok) {
+        const errorBody = await response.text();
+
+        if (response.status === 409) {
+          throw new Error("This review has already been submitted.");
+        }
+
+        if (response.status === 400) {
+          throw new Error("Please check your name, rating and review.");
+        }
+
+        if (response.status === 429) {
+          throw new Error("Too many submissions. Please try again later.");
+        }
+
+        throw new Error(
+          `Review submission failed (${response.status}). ${errorBody}`,
+        );
+      }
+
+      alert("Review submitted successfully!");
+      closeReviewForm();
+      await loadProductReviews();
+    } catch (error) {
+      console.error("Review submission error:", error);
+      alert(error.message || "Could not submit the review. Please try again.");
+    } finally {
+      submitButton.disabled = false;
+      submitButton.textContent = "Submit Review";
+    }
+  });
 
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", loadProductReviews);
